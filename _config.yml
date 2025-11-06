@@ -4,16 +4,16 @@
 
 # Site
 title: Ethylene's Blog
-subtitle: ''
-description: '若遇见你不是奇迹，灵魂便不曾言语'
-keywords: 'Python,Pandas,MySQL,Django'
+subtitle: '沉淀'
+description: '想到什么就写些什么'
+keywords: Python,Pandas,MySQL,Django
 author: Ethylene
 language: zh-CN
 timezone: 'Asia/Shanghai'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://example.com
+url: https://ethylenekun.github.io/
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -46,7 +46,7 @@ future: true
 syntax_highlighter: highlight.js
 highlight:
   line_number: true
-  auto_detect: false
+  auto_detect: true
   tab_replace: ''
   wrap: true
   hljs: false
@@ -104,3 +104,8 @@ deploy:
   type: 'git'
   repo: 'git@github.com:Ethylenekun/Ethylenekun.github.io.git'
   branch: main
+
+search:
+  path: search.xml
+  field: all
+  content: true
