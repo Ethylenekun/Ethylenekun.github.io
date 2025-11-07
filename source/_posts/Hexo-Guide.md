@@ -7,7 +7,7 @@ tags:
 - Github
 categories: Hexo
 description: 搭建Hexo博客基本步骤，以及图床和Github的配置
-cover: http://223.94.54.77:5543/Hexo/Hexo.png
+cover: https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Hexo.png
 swiper_index: 1
 ---
 
@@ -57,7 +57,7 @@ ssh-keygen -t rsa -C "xxx@gmail.com"
 ssh -T git@github.com
 ```
 
-![github ssh key](http://223.94.54.77:5543//2025/11/06/github%20ssh%20key.png)
+![github ssh key](https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/github%20ssh%20key.png)
 
 > 可能会出现错误`ssh: connect to host github.com port 22: Connection timed out `
 >
@@ -130,7 +130,8 @@ cd C:\Users\yixi7\AppData\Roaming\picgo
 npm install picgo-plugin-ftp-uploader
 ```
 
-![image-20251106164713253](http://223.94.54.77:5543//2025/11/06/FTP上传设置.png)
+![image-20251106164713253](https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/FTP%E4%B8%8A%E4%BC%A0%E8%AE%BE%E7%BD%AE.png
+)
 
 ```json
 {
