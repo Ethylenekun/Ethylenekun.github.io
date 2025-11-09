@@ -57,7 +57,7 @@ ssh-keygen -t rsa -C "xxx@gmail.com"
 ssh -T git@github.com
 ```
 
-![github ssh key](https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/github%20ssh%20key.png)
+![github ssh key](https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/github_ssh_key.png)
 
 > 可能会出现错误`ssh: connect to host github.com port 22: Connection timed out `
 >
@@ -130,7 +130,9 @@ cd C:\Users\yixi7\AppData\Roaming\picgo
 npm install picgo-plugin-ftp-uploader
 ```
 
-![image-20251106164713253](https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/FTP%E4%B8%8A%E4%BC%A0%E8%AE%BE%E7%BD%AE.png
+> PicGO FTP上传配置
+
+![PicGO FTP uploader config](https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/FTP%E4%B8%8A%E4%BC%A0%E8%AE%BE%E7%BD%AE.png
 )
 
 ```json
@@ -146,6 +148,16 @@ npm install picgo-plugin-ftp-uploader
     }
 }
 ```
+
+> NAS FTP设置：由于上传的用户少，被动端口范围设置为4200-4205
+
+![NAS FTP config](https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/image-20251109082126997.png)
+
+> 路由设置：FTP端口转发，FTP服务端口和被动端口都要设置转发
+
+![image-20251109083334323](https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/image-20251109083334323.png)
+
+![image-20251109083252737](https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/image-20251109083252737.png)
 
 # 主题设置
 
