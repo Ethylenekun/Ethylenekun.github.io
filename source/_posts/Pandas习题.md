@@ -11,7 +11,7 @@ abbrlink: c02b5fa5
 date: 2025-11-09 16:29:02
 ---
 
-# Pandas习题 - 盖若
+# Pandas习题 - 盖若(入门/基础部分)
 
 ## [解析开始结束年份和最大间隔](https://gairuo.com/m/pandas-parsing-year-gap)
 
@@ -606,4 +606,76 @@ for i,j in df.iterrows():
 
 ---
 
-​	
+## [计算实验仪器正常运行周期时长](https://gairuo.com/m/pandas-normal-period-experimental-instruments)
+
+> 题目：增加 Delta 列来计算显示 T（触发）和 C（结束）状态之间的时间差，状态 C 之后不经过 T 还可能出现状态 C，我们视 T 之后到第一个 C 之间为一个正常运行周期
+
+```python
+df=pd.DataFrame(columns=['Status','t'])
+
+df['Status']=['A','T', 'A','C','C','A','T','T','C','A']
+df['t']= pd.to_datetime(['2021-06-12 08:39:24.813000',
+'2021-06-12 08:39:24.820000',
+'2021-06-12 08:39:25.210000',
+'2021-06-12 08:39:25.217000',
+'2021-06-12 08:44:28.830000',
+'2021-06-12 10:48:10.293000',
+'2021-06-12 10:48:10.300000',
+'2021-06-12 10:48:10.680000',
+'2021-06-12 10:48:10.693000',
+'2021-06-12 10:48:11.223000'])
+
+# 所需结果
+
+'''
+  Status                       t                  Delta
+0      A 2021-06-12 08:39:24.813                    NaT
+1      T 2021-06-12 08:39:24.820                    NaT
+2      A 2021-06-12 08:39:25.210                    NaT
+3      C 2021-06-12 08:39:25.217 0 days 00:00:00.397000
+4      C 2021-06-12 08:44:28.830                    NaT
+5      A 2021-06-12 10:48:10.293                    NaT
+6      T 2021-06-12 10:48:10.300                    NaT
+7      T 2021-06-12 10:48:10.680                    NaT
+8      C 2021-06-12 10:48:10.693 0 days 00:00:00.013000
+9      A 2021-06-12 10:48:11.223                    NaT
+'''
+```
+
+> 解法
+
+```python
+temp = (
+    df.query("Status in ['T','C']")
+    .assign(next_t=(lambda x: (x["Status"] == "C") & (x["Status"].shift() == "T")))
+    .assign(prev_c=(lambda x: (x["Status"] == "T") & (x["Status"].shift(-1) == "C")))
+    .query("(next_t == True) | (prev_c == True)")
+    .assign(Delta = lambda x:x.t.diff())
+    .query("Status == 'C'")
+)
+
+for i,j in temp.iterrows():
+    df.loc[i,"Delta"] = j["Delta"]
+```
+
+---
+
+## [判断当前值是否在本行之前出现过](https://gairuo.com/m/pandas-current-appeared-before)
+
+> 题目：需要增加一列，如果这个数据之前没出现过记为 True，如果出现过记为 False
+
+```python
+df = pd.DataFrame({"ID": [123, 234, 123, 234, 678]})
+```
+
+> 解法
+
+```python
+df.assign(是否是新ID = df.index.map(lambda x:df.loc[x,"ID"] not in df.loc[:x-1,"ID"].values))
+
+# 性能较好
+df.assign(是否是新ID=~df.duplicated(["ID"], keep="first"))
+```
+
+---
+
