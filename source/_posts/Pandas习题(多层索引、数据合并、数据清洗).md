@@ -1,5 +1,5 @@
 ---
-title: Pandas习题-盖若(多级索引/数据合并)
+title: Pandas习题(多层索引、数据合并、数据清洗)
 tags:
   - Python
   - Pandas
@@ -7,11 +7,10 @@ categories: Pandas
 description: Pandas习题，在日常过程中遇见的比较不错的习题
 cover: 'https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png'
 swiper_index: 3
-abbrlink: 141de9b
-date: 2025-11-18 16:04:51
+abbrlink: 9d2692f0
 ---
 
-# Pandas习题 - 盖若(多级索引/数据合并)	
+# Pandas习题 - 多级索引/数据合并/数据清洗
 
 ## [指定列为基准相加两个数据](https://gairuo.com/m/pandas-adds-two-data-specified-column)
 
@@ -105,6 +104,9 @@ cols = df.stack().index.get_level_values(1)
 values = df.stack().values
 
 pd.DataFrame([values],columns=cols)
+
+# 使用pd.concat
+pd.concat([df.loc[[idx],:].set_axis([0]) for idx in df.index],axis=1)
 
 # 官方解法
 df.stack().to_frame().droplevel(0).T
@@ -276,6 +278,284 @@ df = pd.read_csv(StringIO(data), sep=r'\s+')
     .groupby(level=0)
     .sum()
     .pipe(df.join)
+)
+```
+
+---
+
+## [将列表转为以字符为键的字典](https://gairuo.com/m/pandas-list-character-dictionary)
+
+> 题目：键是前边的字母，值是字母后边的数字，如果有多个字母则是一个列表
+
+```python
+m = ['a',1,'b',13,14,'d',67]
+
+# 所需结果
+{'a': 1, 'b': [13, 14], 'd': 67}
+```
+
+> 解法
+
+```python
+df = pd.DataFrame({"x": m})
+
+(
+    df.assign(y=df.x.where(df.x.str.isalpha()))
+    .assign(z=lambda x: x.y.ffill())
+    .query("x!=z")
+    .groupby("z")
+    .x.agg(lambda x: list(x) if len(x) > 1 else x)
+    .to_dict()
+)
+```
+
+---
+
+## [缺失值填充为分组的平均值](https://gairuo.com/m/pandas-missing-values-filled-mean-group)
+
+> 题目：将这两个缺失值按其所在组的平均值进行填充
+
+```python
+df = pd.read_csv('https://gairuo.com/file/data/team.csv')
+
+# 创建缺失值
+# 创建缺失值
+df = df.head(10).loc[:,'name':'Q1']
+df.loc[(1, 2), 'Q1'] = None
+df
+```
+
+> 解法
+
+```python
+# 个人解法
+gb = df.groupby("team").agg({"Q1":"mean"})
+df.set_index('team').fillna(gb).reset_index()
+
+# 官方解法1
+df.apply(lambda x:x.fillna(df.groupby('team').agg({"Q1":"mean"}).loc[x["team"]]),axis=1)
+
+# 官方解法2
+mapping = df.groupby('team').Q1.transform("mean")
+df.assign(Q1 = df.Q1.mask(df.Q1.isna(),mapping))
+```
+
+---
+
+## [根据树状文本解析其上级](https://gairuo.com/m/pandas-parses-parent-tree-text)
+
+> 题目
+
+```python
+from io import StringIO
+
+data = """
+class_
+A
+——B1
+——B2
+————C1
+——B3
+————C2
+————C3
+"""
+
+df = pd.read_csv(StringIO(data))
+
+# 所需结果
+'''
+   0     1     2         foo   res
+0  A  None  None          [A]  None
+1  A    B1  None      [A, B1]     A
+2  A    B2  None      [A, B2]     A
+3  A    B2    C1  [A, B2, C1]    B2
+4  A    B3  None      [A, B3]     A
+5  A    B3    C2  [A, B3, C2]    B3
+6  A    B3    C3  [A, B3, C3]    B3
+'''
+```
+
+> 解法
+
+```python
+(
+    df.class_.str.split('——', expand=True)
+    .replace({'': None})
+    .apply(lambda x: x if x.name == 2 else x.ffill())
+    .assign(foo=lambda x: x.apply(lambda s: s.dropna().to_list(), axis=1))
+    .assign(res=lambda x: x.foo.apply(lambda s: s[-2] if len(s)>1 else None))
+)
+```
+
+---
+
+## [筛选日期连续的数据行](https://gairuo.com/m/pandas-filters-consecutive-dates)
+
+> 题目：筛选出不分位置日期连续的行
+
+```python
+from io import StringIO
+
+data = '''
+a,b,c
+2022/9/23,2022/9/24,2022/9/27
+2022/9/26,2022/9/27,2022/9/23
+2022/9/21,2022/9/22,2022/9/26
+2022/9/26,2022/9/22,2022/9/21
+2022/9/26,2022/9/24,2022/9/27
+2022/9/22,2022/9/21,2022/9/25
+2022/9/26,2022/9/21,2022/9/27
+2022/9/26,2022/9/21,2022/9/23
+2022/9/25,2022/9/24,2022/9/27
+2022/9/23,2022/9/25,2022/9/26
+2022/9/27,2022/9/26,2022/9/23
+2022/9/25,2022/9/24,2022/9/26
+2022/9/25,2022/9/24,2022/9/27
+2022/9/21,2022/9/26,2022/9/22
+2022/9/24,2022/9/25,2022/9/26
+2022/9/25,2022/9/21,2022/9/26
+2022/9/24,2022/9/26,2022/9/23
+2022/9/26,2022/9/22,2022/9/21
+2022/9/22,2022/9/27,2022/9/23
+2022/9/27,2022/9/21,2022/9/25
+2022/9/27,2022/9/25,2022/9/26
+2022/9/26,2022/9/24,2022/9/23
+2022/9/25,2022/9/26,2022/9/23
+2022/9/25,2022/9/21,2022/9/26
+2022/9/23,2022/9/25,2022/9/26
+2022/9/22,2022/9/26,2022/9/23
+2022/9/26,2022/9/27,2022/9/21
+2022/9/25,2022/9/21,2022/9/24
+2022/9/26,2022/9/21,2022/9/27
+2022/9/22,2022/9/21,2022/9/27
+2022/9/27,2022/9/26,2022/9/23
+2022/9/22,2022/9/26,2022/9/27
+2022/9/22,2022/9/27,2022/9/26
+'''
+
+df = pd.read_csv(StringIO(data))
+
+# 所需结果
+'''
+            a          b          c
+11  2022/9/25  2022/9/24  2022/9/26
+14  2022/9/24  2022/9/25  2022/9/26
+20  2022/9/27  2022/9/25  2022/9/26
+'''
+```
+
+> 解法
+
+```python
+def func(ser: pd.Series) -> bool:
+    return (
+        ser.astype("datetime64[ns]").sort_values().diff().dropna().eq(pd.Timedelta("1days")).all()
+    )
+
+df[df.apply(func, axis=1)]
+```
+
+---
+
+## [根据值在其他列中出现的次数指定列值](https://gairuo.com/m/pandas-column-depending-times-other)
+
+> 题目：增加一个名为“Temperature”的新列，当 Container 第一次出现Event为“Clean”时，它的值为4，而所有后续的“Clean“事件的值为3。Dry时的值总是1
+
+```python
+import io
+
+data = '''
+Container Event
+A         Clean
+B         Dry
+A         Clean
+A         Dry
+B         Clean
+C         Clean
+C         Clean
+C         Clean
+'''
+
+df = pd.read_csv(io.StringIO(data), sep=r'\s+')
+
+# 所需结果
+'''
+Container  Event  Temperature
+A          Clean  4
+B          Dry    1
+A          Clean  3
+A          Dry    1
+B          Clean  4
+C          Clean  4
+C          Clean  3
+C          Clean  3
+'''
+```
+
+> 解法
+
+```python
+# 官方解法: 使用np.select
+cond1 = ~df.duplicated()
+cond2 = df['Event'].eq('Clean')
+cond3 = df['Event'].eq('Dry')
+df['Temperature'] = np.select([cond1 & cond2, cond2, cond3], [4, 3, 1])
+
+# 个人解法
+df.assign(
+    Temperature=df.groupby("Container")["Event"]
+    .transform(lambda x:x.mask(x=="Dry",1).mask(x != "Dry",4-x.duplicated()))
+)
+```
+
+---
+
+## [将时间区间展开为年月两列](https://gairuo.com/m/pandas-expands-interval-month-year)
+
+> 题目：将数据按起始日期到结束日期展开，增加年和月列
+
+```python
+from io import StringIO
+
+data = '''
+合同编号    起始日期    结束日期
+BH001   2023-02-20  2024-02-19
+BH002   2023-04-01  2026-03-31
+BH003   2022-04-10  2023-04-09
+BH004   2023-03-01  2024-09-30
+BH005   2023-02-01  2026-01-31
+'''
+
+df = pd.read_csv(StringIO(data), sep=r'\s+')
+
+# 所需结果
+'''
+合同编号    年   月
+BH001   2023    2
+BH001   2023    3
+BH001   2023    4
+BH001   2023    5
+BH001   2023    6
+BH001   2023    7
+BH001   2023    8
+BH001   2023    9
+BH001   2023    10
+BH001   2023    11
+BH001   2023    12
+BH001   2024    1
+BH001   2024    2
+'''
+```
+
+> 解法
+
+```python
+(
+    df.assign(date=df.apply(lambda x: pd.date_range(x["起始日期"], x["结束日期"]), axis=1))
+    .explode("date")
+    .assign(年=lambda x: x["date"].dt.year, 月=lambda x: x["date"].dt.month)
+    .loc[:, ["合同编号", "年", "月"]]
+    .drop_duplicates()
 )
 ```
 
