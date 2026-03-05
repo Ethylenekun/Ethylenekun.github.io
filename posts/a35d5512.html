@@ -1,0 +1,341 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Pandas前置知识 | Ethylene's Blog</title><meta name="author" content="Ethylene"><meta name="copyright" content="Ethylene"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Pandas前置知识(UV&#x2F;Python&#x2F;Numpy)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Pandas前置知识">
+<meta property="og:url" content="https://ethylenekun.github.io/posts/a35d5512.html">
+<meta property="og:site_name" content="Ethylene&#39;s Blog">
+<meta property="og:description" content="Pandas前置知识(UV&#x2F;Python&#x2F;Numpy)">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png">
+<meta property="article:published_time" content="2026-03-05T07:37:17.419Z">
+<meta property="article:modified_time" content="2026-03-05T07:38:33.958Z">
+<meta property="article:author" content="Ethylene">
+<meta property="article:tag" content="Pandas">
+<meta property="article:tag" content="Python">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Pandas前置知识",
+  "url": "https://ethylenekun.github.io/posts/a35d5512.html",
+  "image": "https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png",
+  "datePublished": "2026-03-05T07:37:17.419Z",
+  "dateModified": "2026-03-05T07:38:33.958Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Ethylene",
+      "url": "https://ethylenekun.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="https://ethylenekun.github.io/posts/a35d5512.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!true && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":200,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":150,"languages":{"author":"作者: Ethylene","link":"链接: ","source":"来源: Ethylene's Blog","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'medium_zoom',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.12.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Pandas前置知识',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><!-- hexo injector head_end start --><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiperstyle.css" media="print" onload="this.media='all'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.1.1"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      if ($loadingBox.classList.contains('loaded')) return
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+
+  if (document.readyState === 'complete') {
+    preloader.endLoading()
+  } else {
+    window.addEventListener('load', preloader.endLoading)
+    document.addEventListener('DOMContentLoaded', preloader.endLoading)
+    // Add timeout protection: force end after 7 seconds
+    setTimeout(preloader.endLoading, 7000)
+  }
+
+  if (true) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div id="web_bg" style="background: linear-gradient(135deg, #FCD3CC 20%, #AEF3FB 100%);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">10</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 链接</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></li><li><a class="site-page child" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><img class="site-icon" src="/img/favicon.ico" alt="Logo"><span class="site-name">Ethylene's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">Pandas前置知识</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 链接</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></li><li><a class="site-page child" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Pandas前置知识</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-03-05T07:37:17.419Z" title="发表于 2026-03-05 15:37:17">2026-03-05</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-03-05T07:38:33.958Z" title="更新于 2026-03-05 15:38:33">2026-03-05</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Pandas/">Pandas</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="uv配置虚拟环境"><a href="#uv配置虚拟环境" class="headerlink" title="uv配置虚拟环境"></a>uv配置虚拟环境</h1><p><a target="_blank" rel="noopener" href="https://uv.doczh.com/getting-started/features/">功能介绍</a></p>
+<blockquote>
+<p>更改uv镜像源，修改<code>pyproject.toml</code>文件</p>
+</blockquote>
+<figure class="highlight toml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[[tool.uv.index]]</span></span><br><span class="line"><span class="attr">default</span> = <span class="literal">true</span></span><br><span class="line"><span class="attr">url</span> = <span class="string">&quot;https://pypi.tuna.tsinghua.edu.cn/simple/&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Python管理"><a href="#Python管理" class="headerlink" title="Python管理"></a>Python管理</h2><p><a target="_blank" rel="noopener" href="https://uv.doczh.com/guides/install-python/">python安装</a></p>
+<ul>
+<li><code>uv python install 3.12</code>: 安装 Python 版本</li>
+<li><code>uv python list</code>: 查看可用 Python 版本</li>
+<li><code>uv python uninstall</code>: 卸载 Python 版本</li>
+</ul>
+<h2 id="项目开发"><a href="#项目开发" class="headerlink" title="项目开发"></a>项目开发</h2><p><a target="_blank" rel="noopener" href="https://uv.doczh.com/guides/projects/">项目开发</a></p>
+<ul>
+<li><code>uv init</code>: 创建新 Python 项目</li>
+<li><code>uv venv</code>: 创建<code>.venv</code>虚拟环境,<code>uv venv --python 3.11.6</code>指定版本</li>
+<li><code>uv add</code>: 为项目添加依赖</li>
+<li><code>uv add -r requirements.txt</code>：从 requirements.txt 安装</li>
+<li><code>uv remove</code>: 从项目移除依赖</li>
+<li><code>uv lock --upgrade-package requests</code>: 升级包</li>
+<li><code>uv sync</code>: 同步项目依赖到环境</li>
+<li><code>uv run</code>: 在项目环境中运行命令</li>
+<li><code>uv tree</code>: 查看项目依赖树</li>
+</ul>
+<hr>
+<h1 id="Python前置知识"><a href="#Python前置知识" class="headerlink" title="Python前置知识"></a>Python前置知识</h1><h2 id="推导式"><a href="#推导式" class="headerlink" title="推导式"></a>推导式</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 嵌套推导式，优先进行外层循环</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 靠前的为外层循环，靠后的为内层循环</span></span><br><span class="line">[(color, item) <span class="keyword">for</span> color <span class="keyword">in</span> [<span class="string">&quot;red&quot;</span>, <span class="string">&quot;blue&quot;</span>] <span class="keyword">for</span> item <span class="keyword">in</span> [<span class="string">&quot;pen&quot;</span>, <span class="string">&quot;book&quot;</span>]]</span><br><span class="line"><span class="comment"># [(&#x27;red&#x27;, &#x27;pen&#x27;), (&#x27;red&#x27;, &#x27;book&#x27;), (&#x27;blue&#x27;, &#x27;pen&#x27;), (&#x27;blue&#x27;, &#x27;book&#x27;)]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 外层推导式内的迭代为外层循环，内层推导式内的迭代为内层循环</span></span><br><span class="line">[[(color, item) <span class="keyword">for</span> color <span class="keyword">in</span> [<span class="string">&quot;red&quot;</span>,<span class="string">&quot;blue&quot;</span>]] <span class="keyword">for</span> item <span class="keyword">in</span> [<span class="string">&quot;pen&quot;</span>, <span class="string">&quot;book&quot;</span>]]</span><br><span class="line"><span class="comment"># [[(&#x27;red&#x27;, &#x27;pen&#x27;), (&#x27;blue&#x27;, &#x27;pen&#x27;)], [(&#x27;red&#x27;, &#x27;book&#x27;), (&#x27;blue&#x27;, &#x27;book&#x27;)]]</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>给定3 个二维整数列表L1、L2、L3，它们都是30×20 的列表，即每个列表中包含30 个内层列表，并且每一个内层列表中包含20 个整数。请利用列表推导式，构造一个大小相同的新列表Lnew，其满足任意一个位置的值是L1、L2、L3 相应位置的值的最小值。</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> random</span><br><span class="line">random.seed(<span class="number">0</span>)</span><br><span class="line">n = <span class="number">10000</span></span><br><span class="line">L1 = [[random.randint(-n,n) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">20</span>)] <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">30</span>)]</span><br><span class="line">L2 = [[random.randint(-n,n) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">20</span>)] <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">30</span>)]</span><br><span class="line">L3 = [[random.randint(-n,n) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">20</span>)] <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">30</span>)]</span><br><span class="line"></span><br><span class="line">Lnew = [[<span class="built_in">min</span>([L1[j][i], L2[j][i], L3[j][i]]) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">20</span>)] <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">30</span>)]</span><br></pre></td></tr></table></figure>
+
+<h1 id="Numpy教程"><a href="#Numpy教程" class="headerlink" title="Numpy教程"></a>Numpy教程</h1><h2 id="特殊矩阵"><a href="#特殊矩阵" class="headerlink" title="特殊矩阵"></a>特殊矩阵</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 对角矩阵</span></span><br><span class="line">np.diag([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>])</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">array([[1, 0, 0, 0],</span></span><br><span class="line"><span class="string">       [0, 2, 0, 0],</span></span><br><span class="line"><span class="string">       [0, 0, 3, 0],</span></span><br><span class="line"><span class="string">       [0, 0, 0, 4]])</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="变形"><a href="#变形" class="headerlink" title="变形"></a>变形</h2><blockquote>
+<p><code>T</code> &#x2F; <code>transpose</code> &#x2F; <code>swapaxes</code></p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">carbon = np.random.rand(<span class="number">360</span>, <span class="number">180</span>, <span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">carbon.transpose(<span class="number">1</span>,<span class="number">0</span>,<span class="number">2</span>).shape <span class="comment"># [180,360,3]</span></span><br><span class="line">carbon.T.shape <span class="comment"># [3,180,360]</span></span><br><span class="line">carbon.swapaxes(<span class="number">1</span>,<span class="number">2</span>).shape <span class="comment"># [360,3,180]</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><code>reshape</code></p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">matrix = np.arange(<span class="number">8</span>)</span><br><span class="line"></span><br><span class="line">matrix.reshape(<span class="number">2</span>,-<span class="number">1</span>,order=<span class="string">&quot;C&quot;</span>) <span class="comment"># C先填充内部</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">array([[0, 1, 2, 3],</span></span><br><span class="line"><span class="string">       [4, 5, 6, 7]])</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">matrix.reshape(<span class="number">2</span>,-<span class="number">1</span>,order=<span class="string">&quot;F&quot;</span>) <span class="comment"># F先填充外部</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">array([[0, 2, 4, 6],</span></span><br><span class="line"><span class="string">       [1, 3, 5, 7]])</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>合并 &#x2F; 拆分变形</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 合并</span></span><br><span class="line">pop_man = np.random.rand(<span class="number">20</span>, <span class="number">6</span>, <span class="number">3</span>)  <span class="comment"># 男性（随机生成）</span></span><br><span class="line">pop_women = np.random.rand(<span class="number">20</span>, <span class="number">6</span>, <span class="number">3</span>)  <span class="comment"># 女性（随机生成）</span></span><br><span class="line"></span><br><span class="line">np.stack([pop_man,pop_women],axis=<span class="number">1</span>).shape <span class="comment"># [20,2,6,3] 合并创建新的维度</span></span><br><span class="line">np.concatenate([pop_man, pop_women], axis=<span class="number">1</span>).shape <span class="comment"># [20,12,3] 合并现有维度</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 拆分</span></span><br><span class="line">np.split(pop_man,indices_or_sections=<span class="number">3</span>,axis=<span class="number">1</span>)[<span class="number">0</span>].shape <span class="comment"># [20,2,3] 均分成三等份</span></span><br><span class="line">[i.shape <span class="keyword">for</span> i <span class="keyword">in</span> np.split(pop_man,indices_or_sections=[<span class="number">1</span>,<span class="number">4</span>],axis=<span class="number">1</span>)] <span class="comment"># [(20, 1, 3), (20, 3, 3), (20, 2, 3)] 按照分割点</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 重复</span></span><br><span class="line"><span class="comment"># 一维数组</span></span><br><span class="line">a = np.arange(<span class="number">3</span>)</span><br><span class="line">np.repeat(a,<span class="number">2</span>) <span class="comment"># array([0,0,1,1,2,2])</span></span><br><span class="line">np.repeat(a,[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]) <span class="comment"># array([0,1,1,2,2,])</span></span><br><span class="line"><span class="comment"># 二维数组</span></span><br><span class="line">a = np.array([[<span class="number">1</span>,<span class="number">2</span>],[<span class="number">3</span>,<span class="number">4</span>]])</span><br><span class="line">np.repeat(a, repeats=[<span class="number">1</span>,<span class="number">2</span>], axis=<span class="number">1</span>) <span class="comment"># [[1,2,2],[3,4,4]]</span></span><br><span class="line">np.repeat(a, repeats=[<span class="number">1</span>,<span class="number">2</span>], axis=<span class="number">0</span>) <span class="comment"># [[1,2],[3,4],[3,4]]</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>请使用repeat()函数构造两个10×10 的数组，第一个数组要求第i 行的元素值都为i，第二个数组要求第i 列的元素值都为i</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">arr = np.arange(<span class="number">1</span>,<span class="number">11</span>)</span><br><span class="line">np.repeat(arr.reshape(<span class="number">10</span>,<span class="number">1</span>),repeats=<span class="number">10</span>,axis=<span class="number">1</span>) <span class="comment"># 等效于arr[:,None]</span></span><br><span class="line">np.repeat(arr.reshape(<span class="number">1</span>,<span class="number">10</span>),repeats=<span class="number">10</span>,axis=<span class="number">0</span>) <span class="comment"># 等效于arr[None,:]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="切片"><a href="#切片" class="headerlink" title="切片"></a>切片</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">target = np.arange(<span class="number">24</span>).reshape(<span class="number">4</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">array([[[ 0,  1,  2],</span></span><br><span class="line"><span class="string">        [ 3,  4,  5]],</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">       [[ 6,  7,  8],</span></span><br><span class="line"><span class="string">        [ 9, 10, 11]],</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">       [[12, 13, 14],</span></span><br><span class="line"><span class="string">        [15, 16, 17]],</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">       [[18, 19, 20],</span></span><br><span class="line"><span class="string">        [21, 22, 23]]])</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 按具体位置取出</span></span><br><span class="line">target[[<span class="number">0</span>, <span class="number">1</span>], [<span class="number">0</span>, <span class="number">1</span>], [<span class="number">0</span>, <span class="number">1</span>]]  <span class="comment"># array([0, 10])</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 连续多个出现在最初几个维度的全体切片“:”，可以使用...来简写</span></span><br><span class="line">target[..., <span class="number">0</span>::<span class="number">2</span>]</span><br></pre></td></tr></table></figure>
+
+<h2 id="常用函数"><a href="#常用函数" class="headerlink" title="常用函数"></a>常用函数</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 标准差 / 方差 -&gt; 方差 sum((每个值-平均值)**2) / 值个数 -&gt; 标准差 sqrt(方差)</span></span><br><span class="line">np.var</span><br><span class="line">np.std</span><br><span class="line"></span><br><span class="line"><span class="comment"># 最大值/最小值索引 (类似pandas的idxmax/idxmin)</span></span><br><span class="line">np.argmax</span><br><span class="line">np.argmin</span><br><span class="line"><span class="comment"># 返回非0数的索引</span></span><br><span class="line">a = np.array([<span class="number">0</span>, -<span class="number">5</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>, -<span class="number">1</span>])</span><br><span class="line">np.nonzero(a) <span class="comment"># (array([1, 3, 4, 5]),)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 分位数</span></span><br><span class="line">np.percentile(arr,<span class="number">50</span>) <span class="comment"># 等同于中位数</span></span><br><span class="line"><span class="comment"># 两种方法相同</span></span><br><span class="line">np.percentile(arr,<span class="number">20</span>)</span><br><span class="line">np.quantile(arr,q = <span class="number">0.2</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 数值大小比较 np.less_equal</span></span><br><span class="line">np.greater([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>], <span class="number">2</span>)  <span class="comment"># array([False, False,  True,  True])</span></span><br><span class="line">np.less([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>], <span class="number">2</span>)  <span class="comment"># array([ True, False, False, False])</span></span><br><span class="line">np.equal([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>], <span class="number">2</span>)  <span class="comment"># array([False,  True, False, False])</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 逻辑运算</span></span><br><span class="line">np.logical_and</span><br><span class="line">np.logical_or</span><br><span class="line">np.logical_not</span><br><span class="line"></span><br><span class="line">np.<span class="built_in">any</span></span><br><span class="line">np.<span class="built_in">all</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 条件运算</span></span><br><span class="line">arr = np.arange(<span class="number">1</span>,<span class="number">11</span>)</span><br><span class="line">np.where(arr % <span class="number">2</span> == <span class="number">0</span>,arr,np.nan) <span class="comment"># array([nan,  2., nan,  4., nan,  6., nan,  8., nan, 10.])</span></span><br><span class="line"></span><br><span class="line">arr = np.arange(<span class="number">1</span>,<span class="number">11</span>)</span><br><span class="line">np.select([arr % <span class="number">2</span>==<span class="number">0</span>,<span class="literal">True</span>],[<span class="number">1</span>,<span class="number">2</span>]) <span class="comment"># 若为偶数返回1,否则返回2 / 返回的数据类型需与之前一致</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 排序</span></span><br><span class="line">np.sort</span><br><span class="line"></span><br><span class="line"><span class="comment"># 去重</span></span><br><span class="line">np.unique</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>二维扩展</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">my_matrix = np.random.randint(<span class="number">20</span>, <span class="number">40</span>, <span class="number">24</span>).reshape(<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>)<span class="comment"># 维度分别代表学校、年级、班级</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">array([[[21, 25, 37, 31],</span></span><br><span class="line"><span class="string">[39, 32, 36, 34],</span></span><br><span class="line"><span class="string">[37, 27, 31, 24]],</span></span><br><span class="line"><span class="string">[[37, 38, 22, 33],</span></span><br><span class="line"><span class="string">[30, 33, 26, 33],</span></span><br><span class="line"><span class="string">[20, 22, 21, 35]]])</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line">my_matrix.<span class="built_in">sum</span>(axis=(<span class="number">1</span>, <span class="number">2</span>)) <span class="comment"># 把年级和班级的维度聚合起来，只保留学校</span></span><br><span class="line"><span class="comment"># array([374, 350])</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>给定一个维度为m×n 的整数数组，请返回一个元素为0 或1 的同维度数组，当且仅当某位置在原数组中的对应元素是原数组同行元素中的最大值时，该位置的元素取1。</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">matrix = np.random.randint(<span class="number">1</span>,<span class="number">10</span>,(<span class="number">5</span>,<span class="number">5</span>))</span><br><span class="line"></span><br><span class="line">np.where(matrix == matrix.<span class="built_in">max</span>(axis=<span class="number">1</span>).reshape(<span class="number">5</span>,<span class="number">1</span>),<span class="number">1</span>,<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+
+<hr>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://ethylenekun.github.io">Ethylene</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://ethylenekun.github.io/posts/a35d5512.html">https://ethylenekun.github.io/posts/a35d5512.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://ethylenekun.github.io" target="_blank">Ethylene's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Python/">Python</a><a class="post-meta__tags" href="/tags/Pandas/">Pandas</a></div><div class="post-share"><div class="social-share" data-image="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/posts/488d07c0.html" title="Pandas基础"><img class="cover" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Pandas基础</div></div><div class="info-2"><div class="info-item-1">Pandas基础</div></div></div></a><a class="pagination-related" href="/posts/1a029631.html" title="Pandas基础(可视化、分类)"><img class="cover" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Pandas基础(可视化、分类)</div></div><div class="info-2"><div class="info-item-1">Pandas基础(可视化、分类)</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/posts/c02b5fa5.html" title="Pandas习题-盖若(入门&#x2F;基础部分)"><img class="cover" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-09</div><div class="info-item-2">Pandas习题-盖若(入门&#x2F;基础部分)</div></div><div class="info-2"><div class="info-item-1">Pandas习题，在日常过程中遇见的比较不错的习题</div></div></div></a><a class="pagination-related" href="/posts/1a029631.html" title="Pandas基础(可视化、分类)"><img class="cover" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-03-05</div><div class="info-item-2">Pandas基础(可视化、分类)</div></div><div class="info-2"><div class="info-item-1">Pandas基础(可视化、分类)</div></div></div></a><a class="pagination-related" href="/posts/9d2692f0.html" title="Pandas习题(多层索引、数据合并、数据清洗)"><img class="cover" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-12-06</div><div class="info-item-2">Pandas习题(多层索引、数据合并、数据清洗)</div></div><div class="info-2"><div class="info-item-1">Pandas习题，在日常过程中遇见的比较不错的习题</div></div></div></a><a class="pagination-related" href="/posts/1bf93122.html" title="Pandas习题(分组聚合、重塑透视)"><img class="cover" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-12-06</div><div class="info-item-2">Pandas习题(分组聚合、重塑透视)</div></div><div class="info-2"><div class="info-item-1">Pandas习题，在日常过程中遇见的比较不错的习题</div></div></div></a><a class="pagination-related" href="/posts/4cbd3882.html" title="Pandas基础(时间日期、文本处理、样式)"><img class="cover" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-03-05</div><div class="info-item-2">Pandas基础(时间日期、文本处理、样式)</div></div><div class="info-2"><div class="info-item-1">Pandas基础(时间日期、文本处理、样式)</div></div></div></a><a class="pagination-related" href="/posts/488d07c0.html" title="Pandas基础"><img class="cover" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-03-05</div><div class="info-item-2">Pandas基础</div></div><div class="info-2"><div class="info-item-1">Pandas基础</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Ethylene</div><div class="author-info-description">想到什么就写些什么</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">10</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Ethylenekun"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Ethylenekun" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:ethylene786751200@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #24292e;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#uv%E9%85%8D%E7%BD%AE%E8%99%9A%E6%8B%9F%E7%8E%AF%E5%A2%83"><span class="toc-number">1.</span> <span class="toc-text">uv配置虚拟环境</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Python%E7%AE%A1%E7%90%86"><span class="toc-number">1.1.</span> <span class="toc-text">Python管理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91"><span class="toc-number">1.2.</span> <span class="toc-text">项目开发</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Python%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="toc-number">2.</span> <span class="toc-text">Python前置知识</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8E%A8%E5%AF%BC%E5%BC%8F"><span class="toc-number">2.1.</span> <span class="toc-text">推导式</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Numpy%E6%95%99%E7%A8%8B"><span class="toc-number">3.</span> <span class="toc-text">Numpy教程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%89%B9%E6%AE%8A%E7%9F%A9%E9%98%B5"><span class="toc-number">3.1.</span> <span class="toc-text">特殊矩阵</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%98%E5%BD%A2"><span class="toc-number">3.2.</span> <span class="toc-text">变形</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%87%E7%89%87"><span class="toc-number">3.3.</span> <span class="toc-text">切片</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0"><span class="toc-number">3.4.</span> <span class="toc-text">常用函数</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/posts/4cbd3882.html" title="Pandas基础(时间日期、文本处理、样式)"><img src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Pandas基础(时间日期、文本处理、样式)"/></a><div class="content"><a class="title" href="/posts/4cbd3882.html" title="Pandas基础(时间日期、文本处理、样式)">Pandas基础(时间日期、文本处理、样式)</a><time datetime="2026-03-05T07:37:17.461Z" title="发表于 2026-03-05 15:37:17">2026-03-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/488d07c0.html" title="Pandas基础"><img src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Pandas基础"/></a><div class="content"><a class="title" href="/posts/488d07c0.html" title="Pandas基础">Pandas基础</a><time datetime="2026-03-05T07:37:17.443Z" title="发表于 2026-03-05 15:37:17">2026-03-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/a35d5512.html" title="Pandas前置知识"><img src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Pandas前置知识"/></a><div class="content"><a class="title" href="/posts/a35d5512.html" title="Pandas前置知识">Pandas前置知识</a><time datetime="2026-03-05T07:37:17.419Z" title="发表于 2026-03-05 15:37:17">2026-03-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/1a029631.html" title="Pandas基础(可视化、分类)"><img src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Pandas基础(可视化、分类)"/></a><div class="content"><a class="title" href="/posts/1a029631.html" title="Pandas基础(可视化、分类)">Pandas基础(可视化、分类)</a><time datetime="2026-03-05T07:37:17.396Z" title="发表于 2026-03-05 15:37:17">2026-03-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/78adfe16.html" title="CSS3核心技术"><img src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/CSS.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CSS3核心技术"/></a><div class="content"><a class="title" href="/posts/78adfe16.html" title="CSS3核心技术">CSS3核心技术</a><time datetime="2026-01-02T06:24:26.219Z" title="发表于 2026-01-02 14:24:26">2026-01-02</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Ethylene</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.1</a></span></div><div class="footer_custom_text">我也是有底线的</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.1"></script><script src="/js/main.js?v=5.5.1"></script><script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/fireworks.min.js"></script><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script><script>(() => {
+  const pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+  window.pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+  })
+
+  const triggerPjaxFn = (val) => {
+    if (!val) return
+    Object.values(val).forEach(fn => {
+      try {
+        fn()
+      } catch (err) {
+        console.debug('Pjax callback failed:', err)
+      }
+    })
+  }
+
+  document.addEventListener('pjax:send', () => {
+    // removeEventListener
+    btf.removeGlobalFnEvent('pjaxSendOnce')
+    btf.removeGlobalFnEvent('themeChange')
+
+    // reset readmode
+    const $bodyClassList = document.body.classList
+    if ($bodyClassList.contains('read-mode')) $bodyClassList.remove('read-mode')
+
+    triggerPjaxFn(window.globalFn.pjaxSend)
+  })
+
+  document.addEventListener('pjax:complete', () => {
+    btf.removeGlobalFnEvent('pjaxCompleteOnce')
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+      const newScript = document.createElement('script')
+      const content = item.text || item.textContent || item.innerHTML || ""
+      Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.appendChild(document.createTextNode(content))
+      item.parentNode.replaceChild(newScript, item)
+    })
+
+    triggerPjaxFn(window.globalFn.pjaxComplete)
+  })
+
+  document.addEventListener('pjax:error', e => {
+    if (e.request.status === 404) {
+      const usePjax = true
+      true
+        ? (usePjax ? pjax.loadUrl('/404.html') : window.location.href = '/404.html')
+        : window.location.href = e.request.responseURL
+    }
+  })
+})()</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.1"></script></div></div><!-- hexo injector body_end start --><script data-pjax>
+  function butterfly_swiper_injector_config(){
+    var parent_div_git = document.getElementById('recent-posts');
+    var item_html = '<div class="recent-post-item" style="height: auto;width: 100%"><div class="blog-slider swiper-container-fade swiper-container-horizontal" id="swiper_container"><div class="blog-slider__wrp swiper-wrapper" style="transition-duration: 0ms;"><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;posts/488d07c0.html&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2026-03-05</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;posts/488d07c0.html&quot;);" href="javascript:void(0);" alt="">Pandas基础</a><div class="blog-slider__text">Pandas基础</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;posts/488d07c0.html&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;posts/4cbd3882.html&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2026-03-05</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;posts/4cbd3882.html&quot;);" href="javascript:void(0);" alt="">Pandas基础(时间日期、文本处理、样式)</a><div class="blog-slider__text">Pandas基础(时间日期、文本处理、样式)</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;posts/4cbd3882.html&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;posts/a35d5512.html&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2026-03-05</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;posts/a35d5512.html&quot;);" href="javascript:void(0);" alt="">Pandas前置知识</a><div class="blog-slider__text">Pandas前置知识(UV/Python/Numpy)</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;posts/a35d5512.html&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;posts/1a029631.html&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2026-03-05</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;posts/1a029631.html&quot;);" href="javascript:void(0);" alt="">Pandas基础(可视化、分类)</a><div class="blog-slider__text">Pandas基础(可视化、分类)</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;posts/1a029631.html&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;posts/1bf93122.html&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2025-12-06</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;posts/1bf93122.html&quot;);" href="javascript:void(0);" alt="">Pandas习题(分组聚合、重塑透视)</a><div class="blog-slider__text">Pandas习题，在日常过程中遇见的比较不错的习题</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;posts/1bf93122.html&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;posts/98f3a6d9.html&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/html.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2025-12-25</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;posts/98f3a6d9.html&quot;);" href="javascript:void(0);" alt="">HTML5</a><div class="blog-slider__text">HTML5的标签内容学习笔记</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;posts/98f3a6d9.html&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;posts/78adfe16.html&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/CSS.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2026-01-02</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;posts/78adfe16.html&quot;);" href="javascript:void(0);" alt="">CSS3核心技术</a><div class="blog-slider__text">CSS3的核心技术学习笔记</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;posts/78adfe16.html&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;posts/9d2692f0.html&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2025-12-06</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;posts/9d2692f0.html&quot;);" href="javascript:void(0);" alt="">Pandas习题(多层索引、数据合并、数据清洗)</a><div class="blog-slider__text">Pandas习题，在日常过程中遇见的比较不错的习题</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;posts/9d2692f0.html&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;posts/c02b5fa5.html&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2025-11-09</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;posts/c02b5fa5.html&quot;);" href="javascript:void(0);" alt="">Pandas习题-盖若(入门/基础部分)</a><div class="blog-slider__text">Pandas习题，在日常过程中遇见的比较不错的习题</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;posts/c02b5fa5.html&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;posts/b08947fa.html&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Hexo.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2025-11-07</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;posts/b08947fa.html&quot;);" href="javascript:void(0);" alt="">Hexo Guide</a><div class="blog-slider__text">搭建Hexo博客基本步骤，以及图床和Github的配置</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;posts/b08947fa.html&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div></div><div class="blog-slider__pagination swiper-pagination-clickable swiper-pagination-bullets"></div></div></div>';
+    console.log('已挂载butterfly_swiper')
+    parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+    }
+  var elist = 'undefined'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_swiper_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_swiper_injector_config();
+  }
+  </script><script defer src="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper.min.js"></script><script defer data-pjax src="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper_init.js"></script><!-- hexo injector body_end end --><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true},"react":{"opacity":0.7}});</script></body></html>
