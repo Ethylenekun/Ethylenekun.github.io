@@ -8,7 +8,6 @@ tags:
 categories: Hexo
 description: 搭建Hexo博客基本步骤，以及图床和Github的配置
 cover: https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Hexo.png
-swiper_index: 1
 ---
 
 # 环境配置

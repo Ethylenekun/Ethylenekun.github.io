@@ -6,10 +6,8 @@ tags:
 categories: Pandas
 description: Pandas习题，在日常过程中遇见的比较不错的习题
 cover: 'https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png'
-swiper_index: 3
 abbrlink: 9d2692f0
 ---
-
 # Pandas习题 - 多级索引/数据合并/数据清洗
 
 ## [指定列为基准相加两个数据](https://gairuo.com/m/pandas-adds-two-data-specified-column)

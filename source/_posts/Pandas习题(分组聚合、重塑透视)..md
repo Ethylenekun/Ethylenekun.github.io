@@ -6,10 +6,8 @@ tags:
 categories: Pandas
 description: Pandas习题，在日常过程中遇见的比较不错的习题
 cover: 'https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png'
-swiper_index: 4
 abbrlink: 1bf93122
 ---
-
 # Pandas习题 - 分组聚合/重塑透视
 
 ## [连续打卡（对连续相同的数字计数）](https://gairuo.com/m/pandas-counting-consecutive-value)
@@ -39,6 +37,10 @@ dtype: int64
 
 ```python
 s.groupby(s.ne(s.shift()).cumsum()).cumsum()
+
+s.groupby(s.ne(s.shift(1)).cumsum()).transform("rank",method="first")*s
+
+(s.groupby(s.ne(s.shift(1)).cumsum()).cumcount()+1)*s
 ```
 
 ---
@@ -97,10 +99,11 @@ df = pd.read_csv(StringIO(data),sep="\t")
 
 # 个人解法
 (
-    df.assign(数量 = df.groupby(["日期","产品"]).transform("sum"))
-    .groupby('日期')
-    .apply(lambda x:x.nlargest(1,"数量"))
-    .set_index(["日期","产品"])
+  df.groupby(["日期","产品"],as_index=False)
+  .sum()
+  .sort_values(["日期","数量"],ascending=[True,False])
+  .drop_duplicates(["日期"],keep="first")
+  .set_index(["日期","产品"])
 )
 ```
 
@@ -173,13 +176,13 @@ df = pd.DataFrame({
 > 解法
 
 ```python
-ser = (
-    df.groupby("商品",as_index=False,group_keys=False)["活动名称"]
-    .apply(lambda x:(x != "正价").cumsum())
-    .case_when([(df["活动名称"] == "正价","#")])
+(
+  df.groupby("商品")
+  ["活动名称"]
+  .transform(lambda x:x.mask(x.eq("正价"),0).where(x.eq("正价"),1).cumsum())
+  .mask(df["活动名称"].eq("正价"),"#")
+  .pipe(lambda x:df.assign(编号 = x))
 )
-
-df.assign(编号 = ser)
 ```
 
 ---
@@ -317,9 +320,7 @@ h
 
 ```python
 # 个人解法
-df.groupby("x").apply(
-    lambda x: pd.concat([pd.Series(x.name), x["y"]])
-).reset_index(drop=True)
+df.groupby("x").apply(lambda x:[x.name]+x['y'].to_list()).sum()
 
 # 官方解法
 (df.groupby('x')
@@ -371,9 +372,8 @@ df = pd.read_csv(StringIO(data),sep=r"\s+")
 
 ```python
 (
-    df.assign(grp=df.分组.apply(lambda x: df.groupby('分组').get_group(x).数字.to_list()))
-    .assign(negative=lambda y: y.apply(lambda x: np.negative(x.数字) in x.grp, axis=1))
-    .query('negative == True')
+  df.assign(gb = df.groupby("分组")["数字"].transform(lambda x:[x.unique()]*len(x)))
+  .loc[lambda x:x.apply(lambda y:np.negative(y["数字"]) in y["gb"],axis=1)]
 )
 ```
 
@@ -405,12 +405,11 @@ dtype: int64
 
 ```python
 (
-    df.astype({'date': 'datetime64[ns]'}) # 将数据转为时间类型
-    .sort_values(['name', 'date']) # 排序，用户第一序，时间第二序
-    .groupby('name') # 按用户分组
-    # 对组内（每个用户）的时间做差，如果全为1说明连续
-    .apply(lambda x: (x.date.diff(1).dt.days.fillna(1)==1).all())
-    .map({True: 1, False: 2}) # 枚举映射为 1 和 2
+  df.astype({"date":"datetime64[ns]"})
+  .sort_values(["name","date"])
+  .groupby("name")
+  ["date"]
+  .agg(lambda x:x.diff().ne(pd.Timedelta("1D")).sum())
 )
 ```
 
@@ -542,34 +541,30 @@ df = pd.DataFrame({"n": numbers})
 > 解法
 
 ```python
-# 官方解法1
+# 官方解法
 (
     pd.DataFrame({"n": [3, 6, 22, 0, 25, 1, 7, 5, 2, 13, 14, 26, 27]})
     .sort_values("n", ignore_index=True)
     .assign(sign=lambda x: x.index)
     .assign(sign=lambda x: np.where(x.n.diff(1) > 1, x.sign, np.nan))
-    .fillna(method="ffill")
+    .ffill()
     .fillna(0)
     .groupby("sign")
     .apply(lambda x: x.n.to_list())
     .to_list()
 )
 
-# 官方解法2
-df = df.sort_values('n', ignore_index=True)
-bins = (
-    df.assign(diff=df.n.diff(1))
-    .query('diff>1')
-    .n
-    .to_list()
-)
+# 使用pd.cut
+df.sort_values("n",inplace=True)
 
-(
-    df.set_axis(pd.cut(df.n, [0]+bins, right=False))
-    .groupby(lambda x:x, dropna=False)
-    .apply(lambda x: x.n.to_list())
-    .to_list()
+bins = (
+  df
+  ['n']
+  .diff()
+  .pipe(lambda x:df.loc[x.ne(1),'n'])
+  .to_list()+[np.inf]
 )
+df.groupby(pd.cut(df['n'],bins=bins,right=False))['n'].agg(list).to_list()
 ```
 
 ---
@@ -1006,6 +1001,191 @@ def func(ser: pd.Series):
     df[['id']].assign(foo=df.apply(func, axis=1))
     .explode('foo')
 )
+```
+
+---
+
+## [爆炸字典类型数据](https://gairuo.com/m/pandas-explosion-dictionary-data)
+
+> 题目：将字典类型爆炸
+
+```python
+d = {100: ['1A', '2B'], 200: ['2A', '3B'], 300: ['3A', '3B', '4B'], }
+df = pd.DataFrame({'a': ['new', 'old'], 'b': [d, ['99A', '99B']]})
+```
+
+> 解法
+
+```python
+df.assign(
+    b=df["b"].map(lambda x: x.keys() if isinstance(x, dict) else {-1:x}),
+    c=df["b"].map(lambda x: x.values() if isinstance(x, dict) else [x]), # 字典爆炸时针对于字典的键,所以将后续的值转换为单列表
+).explode([*"bc"])
+```
+
+---
+
+## [将按班数据拆为按学生数据](https://gairuo.com/m/pandas-splits-class-into-student)
+
+> 题目：将学号和姓名拆分
+
+```python
+from io import StringIO
+
+data = """
+班别,参加名单
+1班,11张三2李四3王五4陈小兵15大龙
+2班,19刘兵先98黄赵新2李放
+3班,3曾贤志47欧阳大飞32令狐小龙120周志
+"""
+
+df = pd.read_csv(StringIO(data))
+```
+
+> 解法：
+
+```python
+(
+  df["参加名单"].str.extractall(r"(?P<序号>\d+)(?P<姓名>[^0-9]+)")
+  .droplevel(level=1)
+  .pipe(df.join)
+  .drop(columns=["参加名单"])
+)
+
+
+(
+    df.assign(参加名单=df["参加名单"].str.findall(r"(\d+)([^0-9]+)"))
+    .explode("参加名单")
+    .assign(学号=lambda x: x["参加名单"].str[0], 姓名=lambda x: x["参加名单"].str[1])
+    .drop(columns=["参加名单"])
+)
+```
+
+---
+
+## [增加列名和对应数字信息](https://gairuo.com/m/pandas-column-names-corresponding)
+
+> 题目：在原数据上增加一列，显示当前基金的列名和对应的数字，而且要从大到小排列，为 0 的不显示
+
+```python
+import io
+
+data = '''
+基金名称 电子 传媒 计算机
+ 基金A  1  6   7
+ 基金B  0  3   8
+ 基金C  7  0   9
+
+'''
+df = pd.read_csv(io.StringIO(data), sep=r'\s+')
+```
+
+> 解法：
+
+```python
+# 个人解法
+(
+  df.melt(id_vars="基金名称")
+  .assign(col = lambda x:x.apply(lambda y:f"{y['variable']}({y['value']})",axis=1))
+  .loc[lambda x:~x["col"].str.endswith('(0)')]
+  .sort_values(["基金名称","value"],ascending=[True,False])
+  .groupby('基金名称')
+  .agg({"col":lambda x:"、".join(x)})
+)
+
+# 官方解法
+(
+  df.set_index("基金名称")
+  .apply(lambda x:x[x.ne(0)].sort_values(ascending=False).to_dict(),axis=1)
+  .map(lambda x:[f"{i}({j})" for i,j in x.items()])
+  .map("、".join)
+)
+```
+
+---
+
+## [转换数据为每组一行的宽表](https://gairuo.com/m/pandas-converts-wide-table-group)
+
+> 题目：
+
+```python
+from io import StringIO
+
+data = '''
+id,D,M,U
+1,x1,x2,x3
+1,y1,,y3
+1,z1,z2,z3
+2,a1,a2,a3
+2,b1,b2,
+3,c1,,
+4,,d2,d3
+'''
+
+df = pd.read_csv(StringIO(data))
+
+# 目标数据结果
+'''
+     D1   M1   U1   D2   M2   U2   D3   M3   U3
+id
+1    x1   x2   x3   y1  NaN   y3   z1   z2   z3
+2    a1   a2   a3   b1   b2  NaN  NaN  NaN  NaN
+3    c1  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+4   NaN   d2   d3  NaN  NaN  NaN  NaN  NaN  NaN
+'''
+```
+
+> 解法：
+
+```python
+# 个人解法
+(
+  df.assign(gb=df.groupby("id")["id"].transform(lambda x: x.rank(method="first").astype(int)))
+  .melt(id_vars=["id","gb"])
+  .assign(gb = lambda x:x["variable"]+x["gb"].map(str)).pivot(index="id",columns="gb",values="value")
+  .reindex(columns=[j+i for i in "123" for j in "DMU"])
+)
+
+# 官方解法
+df = df.set_index("id")
+(
+    df.groupby(level=0)
+    .apply(lambda x: pd.Series(x.to_numpy().flatten()))
+    .unstack()
+    .set_axis([f"{c}{i}" for i in range(1, 4) for c in df.columns], axis=1)
+)
+```
+
+---
+
+## [相同的行赋同一个值](https://gairuo.com/m/pandas-assign-same-value-same-row)
+
+> 题目：将整行内容一样的内容做同样的标识
+
+```python
+df = pd.DataFrame([
+    [1,2,4,6],
+    [3,5,6,9],
+    [1,2,4,6],
+    [3,5,6,9],
+    [3,5,6,2],
+], columns=list('abcd'))
+
+# 所需结果
+'''
+   a  b  c  d  f
+0  1  2  4  6  0
+1  3  5  6  9  1
+2  1  2  4  6  0
+3  3  5  6  9  1
+4  3  5  6  2  2
+'''
+```
+
+> 解法：使用pandas.factorize()将这个Series因子化
+
+```python
+df.assign(f=pd.factorize(df.apply(lambda x: tuple(x), axis=1))[0]) 
 ```
 
 ---

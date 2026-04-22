@@ -6,12 +6,10 @@ tags:
 categories: Pandas
 description: Pandas习题，在日常过程中遇见的比较不错的习题
 cover: 'https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png'
-swiper_index: 2
 abbrlink: c02b5fa5
 date: 2025-11-09 16:29:02
 ---
-
-# Pandas习题 - 盖若(入门/基础部分)
+# Pandas习题 - 入门/基础部分
 
 ## [解析开始结束年份和最大间隔](https://gairuo.com/m/pandas-parsing-year-gap)
 
@@ -103,11 +101,10 @@ df2 = pd.DataFrame({'a':[1,2], 'b':[3,4]}, index=['c2','c3'])
 ```
 
 > 解法
-
+>
 1. ```python
-   df1.add(df2,fill_value=0).astype(int)
-   ```
-
+    df1.add(df2,fill_value=0).astype(int)
+    ```
 2. ```python
    (df1 + df2).fillna(df1).fillna(df2).astype(int)
       
@@ -152,12 +149,12 @@ df
 >
 > ```python
 > def My_Counter(letters:str) -> dict:
->  letter_dict = {}
->  
->  for letter in letters:
->      letter_dict[letter] = (letter_dict[letter] + 1 if letter in letter_dict else 1)
->      
->  return letter_dict
+>     letter_dict = {}
+>     
+>     for letter in letters:
+>         letter_dict[letter] = (letter_dict[letter] + 1 if letter in letter_dict else 1)
+>         
+>     return letter_dict
 > ```
 
 ```python
@@ -675,6 +672,45 @@ df.assign(是否是新ID = df.index.map(lambda x:df.loc[x,"ID"] not in df.loc[:x
 
 # 性能较好
 df.assign(是否是新ID=~df.duplicated(["ID"], keep="first"))
+```
+
+---
+
+## [合并两行为一行并调整行顺序](https://gairuo.com/m/pandas-merges-rows-adjusts-row-order)
+
+> 题目：
+>
+> - 将 x 中 A、B 两行值相加命名为 C，放在原 A 的位置
+> - 将 x 中 l 所在行列放在最后一行
+> - 将 x 中 f 所在行列放在第一行
+
+```python
+data = """
+x y z
+Z 1 3
+l 2 4
+A 3 5
+f 4 6
+B 5 7
+O 6 8
+"""
+
+df = pd.read_csv(StringIO(data), sep=r"\s+")
+```
+
+> 解法
+
+```python
+for_merge = ["A", "B"]  # 需要合并的行值
+for_order = ["f", "l"]  # 需要排序的行值
+
+(
+    df.mask(df.x == "A", df[df.x.isin(for_merge)].sum().replace({"AB": "C"}), axis=1)
+    .loc[lambda d: ~d.x.isin(for_merge)]
+    .set_index("x")
+    .pipe(lambda d: d.reindex(["f", *d[~d.index.isin(for_order)].index, "l"]))
+    .reset_index()
+)
 ```
 
 ---

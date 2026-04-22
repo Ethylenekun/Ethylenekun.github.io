@@ -6,7 +6,6 @@ tags:
 categories: FrontEnd
 description: HTML5的标签内容学习笔记
 cover: 'https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/html.jpg'
-swiper_index: 5
 abbrlink: 98f3a6d9
 ---
 
@@ -43,7 +42,7 @@ abbrlink: 98f3a6d9
 
 ### 段落标签p
 
-> 段落<p>标签里面不要放其他块级元素
+> 段落p标签里面不要放其他块级元素
 
 ```html
 <!-- 错误写法 -->
@@ -59,12 +58,12 @@ abbrlink: 98f3a6d9
 
 ### 强调与重要性标签
 
-| 推荐标签(有语义)  |  作用  | 过时标签(无语义) |
-| :---------------: | :----: | :--------------: |
-| <strong></strong> |  加粗  |     <b></b>      |
-|     <em></em>     |  倾斜  |     <i></i>      |
-|    <ins></ins>    | 下划线 |     <u></u>      |
-|    <del></del>    | 删除线 |     <s></s>      |
+| 推荐标签(有语义) |  作用  | 过时标签(无语义) |
+| :--------------: | :----: | :--------------: |
+|      strong      |  加粗  |        b         |
+|        em        |  倾斜  |        i         |
+|       ins        | 下划线 |        u         |
+|       del        | 删除线 |        s         |
 
 ### 图片标签img
 
@@ -146,15 +145,15 @@ abbrlink: 98f3a6d9
 
 ### 网站结构标签
 
-|        标签         |             功能             |
-| :-----------------: | :--------------------------: |
-|  <header></header>  |       网页页眉(头部）        |
-|     <nav></nav>     |            导航栏            |
-|    <main></main>    | 网页内容，每个页面只能有一个 |
-|   <aside></aside>   |            侧边栏            |
-| <article></article> |           文章相关           |
-| <section></section> |             分块             |
-|  <footer></footer>  |       页面页脚（底部）       |
+|  标签   |             功能             |
+| :-----: | :--------------------------: |
+| header  |       网页页眉(头部）        |
+|   nav   |            导航栏            |
+|  main   | 网页内容，每个页面只能有一个 |
+|  aside  |            侧边栏            |
+| article |           文章相关           |
+| section |             分块             |
+| footer  |       页面页脚（底部）       |
 
 ![image-20251225155403584](https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/image-20251225155403584.png)
 
@@ -206,16 +205,16 @@ abbrlink: 98f3a6d9
 
 ### 表格标签
 
-|   标签    |      功能      |
-| :-------: | :------------: |
-|  <table>  |  表格容器标签  |
-| <caption> |    表格标题    |
-|   <tr>    |     行标签     |
-|   <td>    |   单元格标签   |
-|   <th>    | 表头单元格标签 |
-|  <thead>  |    表头区域    |
-|  <tbody>  |  表格内容区域  |
-|  <tfoot>  |  表格底部区域  |
+|  标签   |      功能      |
+| :-----: | :------------: |
+|  table  |  表格容器标签  |
+| caption |    表格标题    |
+|   tr    |     行标签     |
+|   td    |   单元格标签   |
+|   th    | 表头单元格标签 |
+|  thead  |    表头区域    |
+|  tbody  |  表格内容区域  |
+|  tfoot  |  表格底部区域  |
 
 ```html
 <table>
@@ -278,9 +277,7 @@ table {
 
   - `input`标签
 
-    > 通用属性
-    >
-    > - `name`：元素名称，用于表单提交作为键值，又是单选和复选相关联的名称
+    `name`：元素名称，用于表单提交作为键值，又是单选和复选相关联的名称
 
     |  type类型  |                             参数                             |
     | :--------: | :----------------------------------------------------------: |
@@ -301,7 +298,7 @@ table {
 
 ```html
 <!-- 表单实例 -->
-  <form action="" method="get">
+<form action="" method="get">
 
     用户名：<input type="text" placeholder="Enter your username" name="uname" maxlength="10" autocomplete="off">
     <br>
@@ -310,7 +307,7 @@ table {
     <br>
 
     <label>
-      <input type="radio" name="gender" value="male">男
+        <input type="radio" name="gender" value="male">男
     </label>
 
     <input type="radio" name="gender" value="female" id="female" checked>
@@ -318,13 +315,13 @@ table {
     <br>
 
     <label>
-      <input type="checkbox" name="hobby" value="1">1
+        <input type="checkbox" name="hobby" value="1">1
     </label>
     <label>
-      <input type="checkbox" name="hobby" value="2" checked>2
+        <input type="checkbox" name="hobby" value="2" checked>2
     </label>
     <label>
-      <input type="checkbox" name="hobby" value="3">3
+        <input type="checkbox" name="hobby" value="3">3
     </label>
     <br>
 
@@ -335,15 +332,15 @@ table {
     <br>
 
     <select name="level">
-      <option value="a">A</option>
-      <option value="b" selected>B</option>
-      <option value="c">C</option>
+        <option value="a">A</option>
+        <option value="b" selected>B</option>
+        <option value="c">C</option>
     </select>
     <br>
 
     <input type="button" value="提交">
     <button type="reset">重置</button>
-  </form>
+</form>
 ```
 
 ## 字符实体
