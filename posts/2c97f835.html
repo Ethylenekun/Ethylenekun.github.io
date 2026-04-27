@@ -1,0 +1,455 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>MySQL基础(预处理、临时表、窗口函数、CTE) | Ethylene's Blog</title><meta name="author" content="Ethylene"><meta name="copyright" content="Ethylene"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="MySQL基础(预处理、临时表、窗口函数、CTE)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL基础(预处理、临时表、窗口函数、CTE)">
+<meta property="og:url" content="https://ethylenekun.github.io/posts/2c97f835.html">
+<meta property="og:site_name" content="Ethylene&#39;s Blog">
+<meta property="og:description" content="MySQL基础(预处理、临时表、窗口函数、CTE)">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/mysql.jpg">
+<meta property="article:published_time" content="2026-04-27T07:29:25.014Z">
+<meta property="article:modified_time" content="2026-04-27T07:29:25.015Z">
+<meta property="article:author" content="Ethylene">
+<meta property="article:tag" content="SQL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/mysql.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "MySQL基础(预处理、临时表、窗口函数、CTE)",
+  "url": "https://ethylenekun.github.io/posts/2c97f835.html",
+  "image": "https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/mysql.jpg",
+  "datePublished": "2026-04-27T07:29:25.014Z",
+  "dateModified": "2026-04-27T07:29:25.015Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Ethylene",
+      "url": "https://ethylenekun.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="https://ethylenekun.github.io/posts/2c97f835.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!true && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":200,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":150,"languages":{"author":"作者: Ethylene","link":"链接: ","source":"来源: Ethylene's Blog","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'medium_zoom',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.12.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'MySQL基础(预处理、临时表、窗口函数、CTE)',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><!-- hexo injector head_end start --><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiperstyle.css" media="print" onload="this.media='all'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.1.1"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      if ($loadingBox.classList.contains('loaded')) return
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+
+  if (document.readyState === 'complete') {
+    preloader.endLoading()
+  } else {
+    window.addEventListener('load', preloader.endLoading)
+    document.addEventListener('DOMContentLoaded', preloader.endLoading)
+    // Add timeout protection: force end after 7 seconds
+    setTimeout(preloader.endLoading, 7000)
+  }
+
+  if (true) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div id="web_bg" style="background: linear-gradient(135deg, #FCD3CC 20%, #AEF3FB 100%);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">16</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 链接</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></li><li><a class="site-page child" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/mysql.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><img class="site-icon" src="/img/favicon.ico" alt="Logo"><span class="site-name">Ethylene's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">MySQL基础(预处理、临时表、窗口函数、CTE)</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 链接</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></li><li><a class="site-page child" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">MySQL基础(预处理、临时表、窗口函数、CTE)</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-04-27T07:29:25.014Z" title="发表于 2026-04-27 15:29:25">2026-04-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-04-27T07:29:25.015Z" title="更新于 2026-04-27 15:29:25">2026-04-27</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/SQL/">SQL</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="PREPARE预处理"><a href="#PREPARE预处理" class="headerlink" title="PREPARE预处理"></a>PREPARE预处理</h1><ul>
+<li><code>PREPARE</code> - 准备要执行的语句</li>
+<li><code>EXECUTE</code> - 执行由<code>PREPARE</code>语句准备的预准备语句</li>
+<li><code>DEALLOCATE PREPARE</code> - 解除声明</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 在 PREPARE 语句中，占位符 ? 只能用于数据值，不能用于表名、列名等标识符</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">PREPARE</span> stmt <span class="keyword">FROM</span> <span class="string">&#x27;SELECT ? + ? * ?&#x27;</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">SET</span> <span class="variable">@a</span> <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line"><span class="keyword">SET</span> <span class="variable">@b</span> <span class="operator">=</span> <span class="number">3</span>;</span><br><span class="line"><span class="keyword">SET</span> <span class="variable">@c</span> <span class="operator">=</span> <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 等同于SELECT 1,2,3 INTO @a,@b,@c;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">EXECUTE</span> stmt <span class="keyword">USING</span> <span class="variable">@a</span>,<span class="variable">@b</span>,<span class="variable">@c</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">DEALLOCATE</span> <span class="keyword">PREPARE</span> stmt; </span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>示例：根据匹配模式批量删除表</p>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--  根据匹配模式删除对应数据库的表</span></span><br><span class="line"></span><br><span class="line">DELIMITER $</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">PROCEDURE</span> drop_tables_by_pattern(</span><br><span class="line">    <span class="keyword">IN</span> <span class="keyword">pattern</span> <span class="type">VARCHAR</span>(<span class="number">255</span>),</span><br><span class="line">    <span class="keyword">IN</span> db_name <span class="type">VARCHAR</span>(<span class="number">255</span>)</span><br><span class="line">)</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">    <span class="keyword">DECLARE</span> table_count <span class="type">INT</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">-- 检查是否存在匹配表</span></span><br><span class="line">    <span class="keyword">SELECT</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">INTO</span> table_count </span><br><span class="line">    <span class="keyword">FROM</span> information_schema.TABLES </span><br><span class="line">    <span class="keyword">WHERE</span> TABLE_SCHEMA <span class="operator">=</span> db_name </span><br><span class="line">    <span class="keyword">AND</span> TABLE_NAME <span class="keyword">LIKE</span> <span class="keyword">pattern</span>;</span><br><span class="line"></span><br><span class="line">    IF table_count <span class="operator">&gt;</span> <span class="number">0</span> <span class="keyword">THEN</span> </span><br><span class="line">        <span class="keyword">SELECT</span> CONCAT(&quot;DROP TABLE &quot;, </span><br><span class="line">            GROUP_CONCAT(CONCAT(TABLE_SCHEMA, &quot;.&quot;, TABLE_NAME)), &quot;;&quot;) </span><br><span class="line">        <span class="keyword">INTO</span> <span class="variable">@dynamic_sql</span></span><br><span class="line">        <span class="keyword">FROM</span> information_schema.TABLES </span><br><span class="line">        <span class="keyword">WHERE</span> TABLE_SCHEMA <span class="operator">=</span> db_name </span><br><span class="line">        <span class="keyword">AND</span> TABLE_NAME <span class="keyword">LIKE</span> <span class="keyword">pattern</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">PREPARE</span> stmt <span class="keyword">FROM</span> <span class="variable">@dynamic_sql</span>;</span><br><span class="line">        <span class="keyword">EXECUTE</span> stmt;</span><br><span class="line">        <span class="keyword">DEALLOCATE</span> <span class="keyword">PREPARE</span> stmt;</span><br><span class="line">    <span class="keyword">ELSE</span></span><br><span class="line">        <span class="keyword">SELECT</span> <span class="string">&#x27;No tables matched&#x27;</span> <span class="keyword">AS</span> <span class="keyword">result</span>;</span><br><span class="line">    <span class="keyword">END</span> IF;</span><br><span class="line"><span class="keyword">END</span> $</span><br><span class="line"></span><br><span class="line">DELIMITER ;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="TEMPORARY-TABLE临时表"><a href="#TEMPORARY-TABLE临时表" class="headerlink" title="TEMPORARY TABLE临时表"></a>TEMPORARY TABLE临时表</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> TEMPORARY <span class="keyword">TABLE</span> t <span class="keyword">AS</span> (<span class="keyword">SELECT</span> <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">DROP</span> TEMPORARY <span class="keyword">TABLE</span> t;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>会话结束或连接终止时，MySQL会自动删除临时表。当然，您可以使用 <code>DROP TEMPORARY TABLE</code>语句在不再使用它时显式删除临时表</li>
+<li>临时表仅可供创建它的客户端访问。不同的客户端可以创建具有相同名称的临时表而不会导致错误，因为只有创建临时表的客户端才能看到它。但是，在同一会话中，两个临时表不能共享相同的名称</li>
+<li>临时表可以与数据库中的普通表具有相同的名称。例如，如果创建一个名为<code>employees</code>临时表为示例数据库，现有的<code>employees</code>表变得不可访问。您针对<code>employees</code>表发出的每个查询现在都引用临时 <code>employees</code> 表。删除<code>employees</code>临时表时，<code>employees</code>表可用并可再次访问</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center"><strong>特性</strong></th>
+<th align="center"><strong>CTE</strong></th>
+<th align="center"><strong>临时表</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>存储方式</strong></td>
+<td align="center">逻辑结构，不物化数据</td>
+<td align="center">物理存储于tempdb或数据库临时空间</td>
+</tr>
+<tr>
+<td align="center"><strong>生命周期</strong></td>
+<td align="center">仅在定义它的查询块内有效</td>
+<td align="center">会话级或批处理级存在</td>
+</tr>
+<tr>
+<td align="center"><strong>索引支持</strong></td>
+<td align="center">不支持显式索引</td>
+<td align="center">支持创建聚集&#x2F;非聚集索引优化查询</td>
+</tr>
+<tr>
+<td align="center"><strong>性能特性</strong></td>
+<td align="center">适合单次引用的小数据，递归计算更高效</td>
+<td align="center">适合大数据多次引用，统计信息更准确</td>
+</tr>
+<tr>
+<td align="center"><strong>事务支持</strong></td>
+<td align="center">受外层事务影响</td>
+<td align="center">完全支持事务（如回滚操作）</td>
+</tr>
+<tr>
+<td align="center"><strong>典型应用</strong></td>
+<td align="center">递归查询、查询逻辑分层</td>
+<td align="center">跨多步骤的数据加工、复杂ETL流程</td>
+</tr>
+</tbody></table>
+<hr>
+<h1 id="CTE公共表达式"><a href="#CTE公共表达式" class="headerlink" title="CTE公共表达式"></a>CTE公共表达式</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WITH</span> </span><br><span class="line">	t1(n1,n2) <span class="keyword">AS</span> (<span class="keyword">SELECT</span> <span class="number">1</span>,<span class="number">2</span>),</span><br><span class="line">	t2(n1,n2) <span class="keyword">AS</span> (<span class="keyword">SELECT</span> n1 <span class="operator">+</span> <span class="number">1</span> ,n2 <span class="operator">+</span> <span class="number">1</span> <span class="keyword">FROM</span> t1)</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> t1 <span class="keyword">UNION</span> <span class="keyword">ALL</span> <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> t2;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 1. 涉及两个CTE表t1和t2,t2又是由t1产生的</span></span><br><span class="line"><span class="comment">-- 2. cte表中声明表的字段名</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>递归CTE：生成一整个月的日期表</p>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WITH</span> <span class="keyword">RECURSIVE</span> t(d) <span class="keyword">AS</span> (</span><br><span class="line">	<span class="keyword">SELECT</span> &quot;2025-01-01&quot;</span><br><span class="line">	<span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line">	<span class="keyword">SELECT</span> ADDDATE(d,<span class="type">INTERVAL</span> <span class="number">1</span> <span class="keyword">DAY</span>) <span class="keyword">FROM</span> t <span class="keyword">WHERE</span> d <span class="operator">&lt;</span> LAST_DAY(d)</span><br><span class="line">) </span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> t;</span><br></pre></td></tr></table></figure>
+
+<h1 id="窗口函数"><a href="#窗口函数" class="headerlink" title="窗口函数"></a>窗口函数</h1><table>
+<thead>
+<tr>
+<th align="left">姓名</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>CUME_DIST()</code></td>
+<td align="left">累计分配值(小于或等于当前价格的比例)</td>
+</tr>
+<tr>
+<td align="left"><code>DENSE_RANK()</code></td>
+<td align="left">当前行在其分区内的排名，没有间隙</td>
+</tr>
+<tr>
+<td align="left"><code>FIRST_VALUE()</code></td>
+<td align="left">窗口框架第一行的参数值</td>
+</tr>
+<tr>
+<td align="left"><code>LAG()</code></td>
+<td align="left">分区内滞后当前行的行的参数值</td>
+</tr>
+<tr>
+<td align="left"><code>LAST_VALUE()</code></td>
+<td align="left">窗口框架最后一行的参数值</td>
+</tr>
+<tr>
+<td align="left"><code>LEAD()</code></td>
+<td align="left">分区内当前行前导行的参数值</td>
+</tr>
+<tr>
+<td align="left"><code>NTH_VALUE()</code></td>
+<td align="left">来自窗口框架第 N 行的参数值</td>
+</tr>
+<tr>
+<td align="left"><code>NTILE()</code></td>
+<td align="left">当前行在其分区内的桶号。</td>
+</tr>
+<tr>
+<td align="left"><code>PERCENT_RANK()</code></td>
+<td align="left">百分比排名值 <code>(rank - 1) / (rows - 1)</code></td>
+</tr>
+<tr>
+<td align="left"><code>RANK()</code></td>
+<td align="left">当前行在其分区内的排名，有间隙</td>
+</tr>
+<tr>
+<td align="left"><code>ROW_NUMBER()</code></td>
+<td align="left">其分区内的当前行数</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><code>ORDER BY</code>的影响</p>
+<ul>
+<li><p><strong>当使用<code>ORDER BY</code>时</strong>：</p>
+<p>默认窗口框架为 <strong><code>RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code></strong></p>
+<p>窗口包含从分区开始到当前行的所有行，按<code>ORDER BY</code>排序，并包括与当前行具有相同排序值的所有行</p>
+</li>
+<li><p><strong>当不使用<code>ORDER BY</code>时</strong>：</p>
+<p>默认窗口框架为 <strong><code>ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING</code></strong></p>
+<p>窗口包含整个分区的所有行</p>
+</li>
+</ul>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WITH</span> sales(sale_date,amount) <span class="keyword">AS</span> (</span><br><span class="line">	<span class="keyword">SELECT</span> <span class="built_in">CAST</span>(&quot;2023-01-01&quot; <span class="keyword">AS</span> <span class="type">DATE</span>),<span class="number">100</span> </span><br><span class="line">	<span class="keyword">UNION</span> <span class="keyword">ALL</span> </span><br><span class="line">	<span class="keyword">SELECT</span> <span class="built_in">CAST</span>(&quot;2023-01-01&quot; <span class="keyword">AS</span> <span class="type">DATE</span>),<span class="number">100</span>  </span><br><span class="line">	<span class="keyword">UNION</span> <span class="keyword">ALL</span> </span><br><span class="line">	<span class="keyword">SELECT</span> <span class="built_in">CAST</span>(&quot;2023-01-02&quot; <span class="keyword">AS</span> <span class="type">DATE</span>),<span class="number">300</span> </span><br><span class="line">	<span class="keyword">UNION</span> <span class="keyword">ALL</span> </span><br><span class="line">	<span class="keyword">SELECT</span> <span class="built_in">CAST</span>(&quot;2023-01-03&quot; <span class="keyword">AS</span> <span class="type">DATE</span>),<span class="number">200</span> </span><br><span class="line">	<span class="keyword">UNION</span> <span class="keyword">ALL</span> </span><br><span class="line">	<span class="keyword">SELECT</span> <span class="built_in">CAST</span>(&quot;2023-01-04&quot; <span class="keyword">AS</span> <span class="type">DATE</span>),<span class="number">400</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span>,<span class="built_in">SUM</span>(amount) <span class="keyword">OVER</span>(<span class="keyword">ORDER</span> <span class="keyword">BY</span> sale_date),<span class="built_in">SUM</span>(amount) <span class="keyword">OVER</span>() <span class="keyword">FROM</span> sales;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2023-01-01	100	200	 1100</span></span><br><span class="line"><span class="comment">2023-01-01	100	200	 1100</span></span><br><span class="line"><span class="comment">2023-01-02	300	500	 1100</span></span><br><span class="line"><span class="comment">2023-01-03	200	700	 1100</span></span><br><span class="line"><span class="comment">2023-01-04	400	1100 1100</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="窗口框架"><a href="#窗口框架" class="headerlink" title="窗口框架"></a>窗口框架</h2><p><strong>以下函数受到当前框架的影响</strong></p>
+<ul>
+<li>聚合函数</li>
+<li><code>FIRST_VALUE()</code></li>
+<li><code>LAST_VALUE()</code></li>
+<li><code>NTH_VALUE()</code></li>
+</ul>
+<p><strong>单位</strong></p>
+<ul>
+<li><code>CURRENT ROW</code>：当前行</li>
+<li><code>n PRECEDING</code>：往前n行数据</li>
+<li><code>n FOLLOWING</code>：往后n行数据</li>
+<li><code>UNBOUNDED PRECEDING</code>： 表示从前面的起点</li>
+<li><code>UNBOUNDED FOLLOWING</code>：表示到后面的终点</li>
+</ul>
+<h3 id="ROWS和RANGE的区别"><a href="#ROWS和RANGE的区别" class="headerlink" title="ROWS和RANGE的区别"></a>ROWS和RANGE的区别</h3><table>
+<thead>
+<tr>
+<th><strong>模式</strong></th>
+<th><strong>原理</strong></th>
+<th><strong>相同排序值的处理</strong></th>
+<th><strong>适用场景</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>ROWS</strong></td>
+<td>基于物理行偏移</td>
+<td>逐行计算，不合并相同值</td>
+<td>需要明确的行范围（如前N行）</td>
+</tr>
+<tr>
+<td><strong>RANGE</strong></td>
+<td>基于逻辑值范围</td>
+<td>合并相同排序值的行，统一计算</td>
+<td>按值分组计算（如相同日期）</td>
+</tr>
+</tbody></table>
+<p><code>ROWS</code>：基于行号的窗口框架，可以是固定的行数（如 <code>ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING</code>），也可以是相对于当前行的位置（如 <code>ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code>）</p>
+<p><code>RANGE</code>：基于值的范围的窗口框架，它允许你基于列的值来定义窗口的大小。例如，<code>RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING</code> 会创建一个窗口，其中包含当前行和与当前行具有相同值的行</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WITH</span> sales(sale_date,amount) <span class="keyword">AS</span> (</span><br><span class="line">	<span class="keyword">SELECT</span> <span class="built_in">CAST</span>(&quot;2023-01-01&quot; <span class="keyword">AS</span> <span class="type">DATE</span>),<span class="number">100</span> </span><br><span class="line">	<span class="keyword">UNION</span> <span class="keyword">ALL</span> </span><br><span class="line">	<span class="keyword">SELECT</span> <span class="built_in">CAST</span>(&quot;2023-01-01&quot; <span class="keyword">AS</span> <span class="type">DATE</span>),<span class="number">100</span>  </span><br><span class="line">	<span class="keyword">UNION</span> <span class="keyword">ALL</span> </span><br><span class="line">	<span class="keyword">SELECT</span> <span class="built_in">CAST</span>(&quot;2023-01-02&quot; <span class="keyword">AS</span> <span class="type">DATE</span>),<span class="number">300</span> </span><br><span class="line">	<span class="keyword">UNION</span> <span class="keyword">ALL</span> </span><br><span class="line">	<span class="keyword">SELECT</span> <span class="built_in">CAST</span>(&quot;2023-01-03&quot; <span class="keyword">AS</span> <span class="type">DATE</span>),<span class="number">200</span> </span><br><span class="line">	<span class="keyword">UNION</span> <span class="keyword">ALL</span> </span><br><span class="line">	<span class="keyword">SELECT</span> <span class="built_in">CAST</span>(&quot;2023-01-04&quot; <span class="keyword">AS</span> <span class="type">DATE</span>),<span class="number">400</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">  sale_date,</span><br><span class="line">  amount,</span><br><span class="line">  <span class="built_in">SUM</span>(amount) <span class="keyword">OVER</span> (</span><br><span class="line">    <span class="keyword">ORDER</span> <span class="keyword">BY</span> sale_date</span><br><span class="line">    <span class="keyword">RANGE</span> <span class="keyword">BETWEEN</span> UNBOUNDED PRECEDING <span class="keyword">AND</span> <span class="keyword">CURRENT</span> <span class="type">ROW</span></span><br><span class="line">  ) <span class="keyword">AS</span> running_total_range,</span><br><span class="line">	<span class="built_in">SUM</span>(amount) <span class="keyword">OVER</span> (</span><br><span class="line">    <span class="keyword">ORDER</span> <span class="keyword">BY</span> sale_date</span><br><span class="line">    <span class="keyword">ROWS</span> <span class="keyword">BETWEEN</span> UNBOUNDED PRECEDING <span class="keyword">AND</span> <span class="keyword">CURRENT</span> <span class="type">ROW</span></span><br><span class="line">  ) <span class="keyword">AS</span> running_total_rows</span><br><span class="line"><span class="keyword">FROM</span> sales;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2023-01-01	100	200	 100</span></span><br><span class="line"><span class="comment">2023-01-01	100	200	 200</span></span><br><span class="line"><span class="comment">2023-01-02	300	500	 500</span></span><br><span class="line"><span class="comment">2023-01-03	200	700	 700</span></span><br><span class="line"><span class="comment">2023-01-04	400	1100 1100</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><code>RANGE</code>可以对日期进行移动，根据<code>ORDER BY</code>的字段</p>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">	sale_date, </span><br><span class="line">	amount,</span><br><span class="line">	<span class="built_in">SUM</span>(amount) <span class="keyword">OVER</span>(<span class="keyword">ORDER</span> <span class="keyword">BY</span> sale_date <span class="keyword">RANGE</span> <span class="keyword">BETWEEN</span> <span class="type">INTERVAL</span> <span class="number">1</span> <span class="keyword">DAY</span> PRECEDING <span class="keyword">AND</span> <span class="type">INTERVAL</span> <span class="number">1</span> <span class="keyword">DAY</span> FOLLOWING) <span class="keyword">AS</span> sum_range,</span><br><span class="line">	<span class="built_in">SUM</span>(amount) <span class="keyword">OVER</span> (<span class="keyword">ORDER</span> <span class="keyword">BY</span> sale_date <span class="keyword">ROWS</span> <span class="keyword">BETWEEN</span> <span class="number">1</span> PRECEDING <span class="keyword">AND</span> <span class="number">1</span> FOLLOWING) <span class="keyword">AS</span> sum_rows</span><br><span class="line"><span class="keyword">FROM</span> sales;		</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2023-01-01	100	500	200</span></span><br><span class="line"><span class="comment">2023-01-01	100	500	500</span></span><br><span class="line"><span class="comment">2023-01-02	300	700	600</span></span><br><span class="line"><span class="comment">2023-01-03	200	900	900</span></span><br><span class="line"><span class="comment">2023-01-04	400	600	600</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="窗口别名"><a href="#窗口别名" class="headerlink" title="窗口别名"></a>窗口别名</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, category, NAME, price,<span class="built_in">LAG</span>(price,<span class="number">1</span>) <span class="keyword">OVER</span> w <span class="keyword">AS</span> pre_price</span><br><span class="line"><span class="keyword">FROM</span> goods</span><br><span class="line"><span class="keyword">WINDOW</span> w <span class="keyword">AS</span> (<span class="keyword">PARTITION</span> <span class="keyword">BY</span> category_id <span class="keyword">ORDER</span> <span class="keyword">BY</span> price);</span><br></pre></td></tr></table></figure>
+
+<hr>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://ethylenekun.github.io">Ethylene</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://ethylenekun.github.io/posts/2c97f835.html">https://ethylenekun.github.io/posts/2c97f835.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://ethylenekun.github.io" target="_blank">Ethylene's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/SQL/">SQL</a></div><div class="post-share"><div class="social-share" data-image="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/mysql.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/posts/bce68613.html" title="MySQL基础"><img class="cover" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/mysql.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">MySQL基础</div></div><div class="info-2"><div class="info-item-1">MySQL基础部分</div></div></div></a><a class="pagination-related" href="/posts/6b9632bf.html" title="MySQL基础(视图、存储过程、函数、流程控制、变量)"><img class="cover" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/mysql.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">MySQL基础(视图、存储过程、函数、流程控制、变量)</div></div><div class="info-2"><div class="info-item-1">MySQL基础(视图、存储过程、函数、流程控制、变量)</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/posts/18858fac.html" title="MySQL基础(创建和管理库表、DML、数据类型、约束)"><img class="cover" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/mysql.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-04-27</div><div class="info-item-2">MySQL基础(创建和管理库表、DML、数据类型、约束)</div></div><div class="info-2"><div class="info-item-1">MySQL基础(创建和管理库表、DML、数据类型、约束)</div></div></div></a><a class="pagination-related" href="/posts/6b9632bf.html" title="MySQL基础(视图、存储过程、函数、流程控制、变量)"><img class="cover" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/mysql.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-04-27</div><div class="info-item-2">MySQL基础(视图、存储过程、函数、流程控制、变量)</div></div><div class="info-2"><div class="info-item-1">MySQL基础(视图、存储过程、函数、流程控制、变量)</div></div></div></a><a class="pagination-related" href="/posts/be626d7e.html" title="MySQL基础(多表查询、函数、子查询)"><img class="cover" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/mysql.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-04-27</div><div class="info-item-2">MySQL基础(多表查询、函数、子查询)</div></div><div class="info-2"><div class="info-item-1">MySQL基础(多表查询、函数、子查询)</div></div></div></a><a class="pagination-related" href="/posts/bce68613.html" title="MySQL基础"><img class="cover" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/mysql.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-04-27</div><div class="info-item-2">MySQL基础</div></div><div class="info-2"><div class="info-item-1">MySQL基础部分</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Ethylene</div><div class="author-info-description">想到什么就写些什么</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">16</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Ethylenekun"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Ethylenekun" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:ethylene786751200@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #24292e;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#PREPARE%E9%A2%84%E5%A4%84%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">PREPARE预处理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TEMPORARY-TABLE%E4%B8%B4%E6%97%B6%E8%A1%A8"><span class="toc-number">2.</span> <span class="toc-text">TEMPORARY TABLE临时表</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#CTE%E5%85%AC%E5%85%B1%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="toc-number">3.</span> <span class="toc-text">CTE公共表达式</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0"><span class="toc-number">4.</span> <span class="toc-text">窗口函数</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AA%97%E5%8F%A3%E6%A1%86%E6%9E%B6"><span class="toc-number">4.1.</span> <span class="toc-text">窗口框架</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ROWS%E5%92%8CRANGE%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-number">4.1.1.</span> <span class="toc-text">ROWS和RANGE的区别</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AA%97%E5%8F%A3%E5%88%AB%E5%90%8D"><span class="toc-number">4.2.</span> <span class="toc-text">窗口别名</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/posts/488d07c0.html" title="Pandas基础"><img src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Pandas基础"/></a><div class="content"><a class="title" href="/posts/488d07c0.html" title="Pandas基础">Pandas基础</a><time datetime="2026-04-27T07:29:25.021Z" title="发表于 2026-04-27 15:29:25">2026-04-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/4cbd3882.html" title="Pandas基础(时间日期、文本处理、样式)"><img src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Pandas基础(时间日期、文本处理、样式)"/></a><div class="content"><a class="title" href="/posts/4cbd3882.html" title="Pandas基础(时间日期、文本处理、样式)">Pandas基础(时间日期、文本处理、样式)</a><time datetime="2026-04-27T07:29:25.020Z" title="发表于 2026-04-27 15:29:25">2026-04-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/1a029631.html" title="Pandas基础(可视化、分类)"><img src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Pandas基础(可视化、分类)"/></a><div class="content"><a class="title" href="/posts/1a029631.html" title="Pandas基础(可视化、分类)">Pandas基础(可视化、分类)</a><time datetime="2026-04-27T07:29:25.019Z" title="发表于 2026-04-27 15:29:25">2026-04-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/fea6abb8.html" title="Pandas习题(时间日期、文本处理、样式、可视化、分类)"><img src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Pandas习题(时间日期、文本处理、样式、可视化、分类)"/></a><div class="content"><a class="title" href="/posts/fea6abb8.html" title="Pandas习题(时间日期、文本处理、样式、可视化、分类)">Pandas习题(时间日期、文本处理、样式、可视化、分类)</a><time datetime="2026-04-27T07:29:25.018Z" title="发表于 2026-04-27 15:29:25">2026-04-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/a35d5512.html" title="Pandas前置知识"><img src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Pandas前置知识"/></a><div class="content"><a class="title" href="/posts/a35d5512.html" title="Pandas前置知识">Pandas前置知识</a><time datetime="2026-04-27T07:29:25.018Z" title="发表于 2026-04-27 15:29:25">2026-04-27</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Ethylene</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.1</a></span></div><div class="footer_custom_text">我也是有底线的</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.1"></script><script src="/js/main.js?v=5.5.1"></script><script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/fireworks.min.js"></script><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script><script>(() => {
+  const pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+  window.pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+  })
+
+  const triggerPjaxFn = (val) => {
+    if (!val) return
+    Object.values(val).forEach(fn => {
+      try {
+        fn()
+      } catch (err) {
+        console.debug('Pjax callback failed:', err)
+      }
+    })
+  }
+
+  document.addEventListener('pjax:send', () => {
+    // removeEventListener
+    btf.removeGlobalFnEvent('pjaxSendOnce')
+    btf.removeGlobalFnEvent('themeChange')
+
+    // reset readmode
+    const $bodyClassList = document.body.classList
+    if ($bodyClassList.contains('read-mode')) $bodyClassList.remove('read-mode')
+
+    triggerPjaxFn(window.globalFn.pjaxSend)
+  })
+
+  document.addEventListener('pjax:complete', () => {
+    btf.removeGlobalFnEvent('pjaxCompleteOnce')
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+      const newScript = document.createElement('script')
+      const content = item.text || item.textContent || item.innerHTML || ""
+      Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.appendChild(document.createTextNode(content))
+      item.parentNode.replaceChild(newScript, item)
+    })
+
+    triggerPjaxFn(window.globalFn.pjaxComplete)
+  })
+
+  document.addEventListener('pjax:error', e => {
+    if (e.request.status === 404) {
+      const usePjax = true
+      true
+        ? (usePjax ? pjax.loadUrl('/404.html') : window.location.href = '/404.html')
+        : window.location.href = e.request.responseURL
+    }
+  })
+})()</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.1"></script></div></div><!-- hexo injector body_end start --><script data-pjax>
+  function butterfly_swiper_injector_config(){
+    var parent_div_git = document.getElementById('recent-posts');
+    var item_html = '<div class="recent-post-item" style="height: auto;width: 100%"><div class="blog-slider swiper-container-fade swiper-container-horizontal" id="swiper_container"><div class="blog-slider__wrp swiper-wrapper" style="transition-duration: 0ms;"><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;posts/be626d7e.html&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/mysql.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2026-04-27</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;posts/be626d7e.html&quot;);" href="javascript:void(0);" alt="">MySQL基础(多表查询、函数、子查询)</a><div class="blog-slider__text">MySQL基础(多表查询、函数、子查询)</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;posts/be626d7e.html&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;posts/6b9632bf.html&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/mysql.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2026-04-27</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;posts/6b9632bf.html&quot;);" href="javascript:void(0);" alt="">MySQL基础(视图、存储过程、函数、流程控制、变量)</a><div class="blog-slider__text">MySQL基础(视图、存储过程、函数、流程控制、变量)</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;posts/6b9632bf.html&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;posts/488d07c0.html&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2026-04-27</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;posts/488d07c0.html&quot;);" href="javascript:void(0);" alt="">Pandas基础</a><div class="blog-slider__text">Pandas基础</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;posts/488d07c0.html&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;posts/4cbd3882.html&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2026-04-27</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;posts/4cbd3882.html&quot;);" href="javascript:void(0);" alt="">Pandas基础(时间日期、文本处理、样式)</a><div class="blog-slider__text">Pandas基础(时间日期、文本处理、样式)</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;posts/4cbd3882.html&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;posts/a35d5512.html&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2026-04-27</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;posts/a35d5512.html&quot;);" href="javascript:void(0);" alt="">Pandas前置知识</a><div class="blog-slider__text">Pandas前置知识(UV/Python/Numpy)</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;posts/a35d5512.html&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" onclick="pjax.loadUrl(&quot;posts/fea6abb8.html&quot;);" href="javascript:void(0);" alt=""><img width="48" height="48" src="https://gcore.jsdelivr.net/gh/Ethylenekun/images/img/Pandas.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2026-04-27</span><a class="blog-slider__title" onclick="pjax.loadUrl(&quot;posts/fea6abb8.html&quot;);" href="javascript:void(0);" alt="">Pandas习题(时间日期、文本处理、样式、可视化、分类)</a><div class="blog-slider__text">Pandas习题，在日常过程中遇见的比较不错的习题</div><a class="blog-slider__button" onclick="pjax.loadUrl(&quot;posts/fea6abb8.html&quot;);" href="javascript:void(0);" alt="">详情       </a></div></div></div><div class="blog-slider__pagination swiper-pagination-clickable swiper-pagination-bullets"></div></div></div>';
+    console.log('已挂载butterfly_swiper')
+    parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+    }
+  var elist = 'undefined'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_swiper_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_swiper_injector_config();
+  }
+  </script><script defer src="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper.min.js"></script><script defer data-pjax src="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper_init.js"></script><!-- hexo injector body_end end --><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true},"react":{"opacity":0.7}});</script></body></html>
